@@ -1,0 +1,10 @@
+*.o
+*.d
+*.axf
+*.htm
+*.lnp
+*.map
+*.sct
+*.dep
+*.lst
+source insight/
