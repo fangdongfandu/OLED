@@ -36,6 +36,7 @@
 
 /* USER CODE BEGIN Includes */
 #include <stdarg.h>
+#include <time.h>
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -47,8 +48,10 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+
 char debug_log_on = '0';
 static char buffer[512];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +64,9 @@ static void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+
+unsigned char rtc_set_localtime(uint32_t timestamp_receive);
+uint32_t rtc_get_timestamp(void);
 static void sendstring(char *str)
 {
     while(*str!='\0')
@@ -131,6 +137,7 @@ int main(void)
   /* USER CODE BEGIN 3 */
       HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
       log_printf("hello world!\r\n");
+      log_printf("timestamp : %d\r\n",rtc_get_timestamp());
       HAL_Delay(1000);
       
   }
@@ -257,7 +264,7 @@ static void MX_RTC_Init(void)
     Error_Handler();
   }
 
-  DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
+  DateToUpdate.WeekDay = RTC_WEEKDAY_SUNDAY;
   DateToUpdate.Month = RTC_MONTH_JANUARY;
   DateToUpdate.Date = 0x1;
   DateToUpdate.Year = 0x0;
@@ -321,6 +328,84 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+unsigned char rtc_set_localtime(uint32_t timestamp_receive)
+{
+    uint8_t ret = 1;
+    uint32_t beijing_timestamp = 0;
+
+    RTC_TimeTypeDef RTC_TimeStructure;
+    RTC_DateTypeDef RTC_DateStructure;
+    struct tm ptr;
+    if(timestamp_receive > _2000_TIMESTAMP)//the receive data year should be larger than 2000
+    {
+        beijing_timestamp = timestamp_receive + 8 * 3600;
+
+        ptr = *localtime(&beijing_timestamp);
+        RTC_DateStructure.Year = ptr.tm_year - 100;
+        RTC_DateStructure.Month = ptr.tm_mon + 1;
+        RTC_DateStructure.WeekDay = ptr.tm_wday;
+        RTC_DateStructure.Date = ptr.tm_mday;
+        RTC_TimeStructure.Hours = ptr.tm_hour;
+        RTC_TimeStructure.Minutes = ptr.tm_min;
+        RTC_TimeStructure.Seconds = ptr.tm_sec;
+
+        if(HAL_RTC_SetTime(&hrtc, &RTC_TimeStructure, RTC_FORMAT_BIN) != HAL_OK)
+        {
+            log_printf("set time fail !\r\n");
+            ret = 0;
+        }
+
+        if(HAL_RTC_SetDate(&hrtc, &RTC_DateStructure, RTC_FORMAT_BIN) != HAL_OK)
+        {
+            log_printf("set date fail !\r\n");
+            ret = 0;
+        }
+    }
+    else
+    {
+        ret = 0;
+    }
+    return ret;
+}
+
+uint32_t rtc_get_timestamp(void)
+{
+    uint32_t timep;
+
+    struct tm ptr;
+    RTC_DateTypeDef sdatestructureget;
+    RTC_TimeTypeDef stimesstructureget;
+
+    if(HAL_RTC_GetTime(&hrtc,&stimesstructureget,RTC_FORMAT_BIN) != HAL_OK)
+    {
+        log_printf("get time fail!\r\n");
+    }
+    if(HAL_RTC_GetDate(&hrtc,&sdatestructureget,RTC_FORMAT_BIN) != HAL_OK)
+    {
+        log_printf("get date fail!\r\n");
+    }
+    /* printf the date and time */
+        log_printf("%02d-%02d-%02d   ",2000 + sdatestructureget.Year,sdatestructureget.Month, sdatestructureget.Date);
+
+        log_printf("%02d:%02d:%02d\r\n",stimesstructureget.Hours,stimesstructureget.Minutes,stimesstructureget.Seconds);
+
+    ptr.tm_year = sdatestructureget.Year + 100 ;
+    ptr.tm_mon = sdatestructureget.Month - 1;
+    ptr.tm_mday = sdatestructureget.Date;
+    ptr.tm_wday = sdatestructureget.WeekDay;
+    ptr.tm_hour = stimesstructureget.Hours;
+    ptr.tm_min = stimesstructureget.Minutes;
+    ptr.tm_sec = stimesstructureget.Seconds;
+
+    timep = mktime(&ptr) - 8 * 3600;
+
+    return timep;
+}
+
+
+
+
 
 /* USER CODE END 4 */
 

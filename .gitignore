@@ -7,4 +7,5 @@
 *.sct
 *.dep
 *.lst
+*.crf
 source insight/

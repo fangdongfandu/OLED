@@ -43,6 +43,8 @@
 
 /* USER CODE BEGIN Private defines */
 
+#define _2000_TIMESTAMP 946656000
+
 /* USER CODE END Private defines */
 
 /**
