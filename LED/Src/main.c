@@ -37,6 +37,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdarg.h>
 #include <time.h>
+#include "oled.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -125,11 +126,12 @@ int main(void)
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
-
+  oled_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  oled_showstring(0,0, "FD    OLED TEST");  
   while (1)
   {
   /* USER CODE END WHILE */
@@ -137,8 +139,8 @@ int main(void)
   /* USER CODE BEGIN 3 */
       HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
       log_printf("hello world!\r\n");
-      log_printf("timestamp : %d\r\n",rtc_get_timestamp());
-      HAL_Delay(1000);
+//      log_printf("timestamp : %d\r\n",rtc_get_timestamp());
+      HAL_Delay(2000);
       
   }
   /* USER CODE END 3 */
@@ -264,7 +266,7 @@ static void MX_RTC_Init(void)
     Error_Handler();
   }
 
-  DateToUpdate.WeekDay = RTC_WEEKDAY_SUNDAY;
+  DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
   DateToUpdate.Month = RTC_MONTH_JANUARY;
   DateToUpdate.Date = 0x1;
   DateToUpdate.Year = 0x0;
@@ -319,11 +321,29 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(SPI_RS_SET_GPIO_Port, SPI_RS_SET_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(OLED_SPI_RST_GPIO_Port, OLED_SPI_RST_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SPI_RS_SET_Pin */
+  GPIO_InitStruct.Pin = SPI_RS_SET_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(SPI_RS_SET_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : OLED_SPI_RST_Pin */
+  GPIO_InitStruct.Pin = OLED_SPI_RST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(OLED_SPI_RST_GPIO_Port, &GPIO_InitStruct);
 
 }
 
