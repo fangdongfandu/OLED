@@ -41,10 +41,16 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define SPI_RS_SET_Pin GPIO_PIN_6
+#define SPI_RS_SET_GPIO_Port GPIOA
+#define OLED_SPI_RST_Pin GPIO_PIN_0
+#define OLED_SPI_RST_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 #define _2000_TIMESTAMP 946656000
 
+void log_printf(char* format,...);
 /* USER CODE END Private defines */
 
 /**
