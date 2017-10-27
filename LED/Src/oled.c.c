@@ -25,11 +25,11 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_HARD_OUTPUT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
+  hspi1.Init.CRCPolynomial = 5;
   if (HAL_SPI_Init(&hspi1) != HAL_OK)
   {
     log_printf("SPI Init fail!\r\n");
@@ -61,12 +61,10 @@ void oled_wr_byte(uint8_t dat,uint8_t cmd)
         oled_rs_set();
     else
         oled_rs_clr();
-    if((temp = HAL_SPI_Transmit(&hspi1,&data,sizeof(uint8_t),5000)) != HAL_OK)
+    if(HAL_SPI_Transmit(&hspi1,&data,sizeof(uint8_t),5000) != HAL_OK)
     {
-        log_printf("temp : %d\r\n",temp);
         log_printf("spi transmit fail!\r\n");
     }
-    log_printf("############ data :%x \r\n",data);
     oled_rs_set();
 }
 
@@ -199,7 +197,7 @@ void oled_showstring(uint8_t x,uint8_t y,const uint8_t *p)
 void oled_init(void)
 {
     MX_SPI1_Init();
-    __HAL_SPI_ENABLE(&hspi1);
+    //__HAL_SPI_ENABLE(&hspi1);
     oled_rst_clr();
     HAL_Delay(100);
     oled_rst_set();

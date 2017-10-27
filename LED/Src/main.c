@@ -131,7 +131,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  oled_showstring(0,0, "FD    OLED TEST");  
+  oled_showstring(0,0, "FD    LED TEST");
+  oled_showstring(0,48,"2017/10/26");
+  oled_refresh_gram();
   while (1)
   {
   /* USER CODE END WHILE */
