@@ -38,6 +38,8 @@
 #include <stdarg.h>
 #include <time.h>
 #include "oled.h"
+#include "oled_gui.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -52,6 +54,7 @@ UART_HandleTypeDef huart1;
 
 char debug_log_on = '0';
 static char buffer[512];
+char angle;
 
 /* USER CODE END PV */
 
@@ -131,8 +134,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  oled_showstring(0,0, "FD    LED TEST");
-  oled_showstring(0,48,"2017/10/26");
+  oled_showstring(0,0, "hello world!");
+//  oled_showstring(0,48,"2017/10/26");
+//  oled_draw_line(0,62,50,59,1);
+//  oled_draw_line(0,30,50,50,1);
+//  oled_draw_circle(30,30,20,1);
+//  oled_sectorial_circle(30,30,0,180,30,1);
   oled_refresh_gram();
   while (1)
   {
@@ -140,10 +147,9 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
       HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
-      log_printf("hello world!\r\n");
+      log_printf("hello world!%f\r\n",sin(3));
 //      log_printf("timestamp : %d\r\n",rtc_get_timestamp());
-      HAL_Delay(2000);
-      
+      HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 
