@@ -71,20 +71,46 @@ void oled_draw_line(uint8_t xstart,uint8_t ystart,uint8_t xend,uint8_t yend,uint
         }
 }
 
+//draw circle with the middle point way
 void oled_draw_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t t)
 {
-    int8_t xend,yend;
-    double setar;
-    for(setar = 0; setar <= 359; setar++)
+    uint8_t xend,yend;
+    int d;
+    
+    xend = 0;
+    yend = r;
+    d = 3 - 2 * r;
+    
+    oled_drawpoint(x + xend,y + yend,1);
+    oled_drawpoint(x + xend,y - yend,1);
+    oled_drawpoint(x - xend,y + yend,1);
+    oled_drawpoint(x - xend,y - yend,1);
+    oled_drawpoint(x + yend,y + xend,1);
+    oled_drawpoint(x + yend,y - xend,1);
+    oled_drawpoint(x - yend,y + xend,1);
+    oled_drawpoint(x - yend,y - xend,1);
+    
+    while(xend < yend)
+    {
+        if(d < 0)
         {
-            xend = x - (int8_t)(r * cos(setar/180 * PI));
-            if(xend < 0||xend >127)
-                continue ;
-            yend = y - (int8_t)(r * sin(setar/180 * PI));
-            if(yend < 0||yend > 63)
-                continue ;
-            oled_drawpoint(xend,yend,t);
-        }   
+            d = d + 4 * xend + 6;
+        }
+        else
+        {
+            d = d + 4 * (xend - yend) + 10;
+            yend--;
+        }
+        xend++;
+        oled_drawpoint(x + xend,y + yend,1);
+        oled_drawpoint(x + xend,y - yend,1);
+        oled_drawpoint(x - xend,y + yend,1);
+        oled_drawpoint(x - xend,y - yend,1);
+        oled_drawpoint(x + yend,y + xend,1);
+        oled_drawpoint(x + yend,y - xend,1);
+        oled_drawpoint(x - yend,y + xend,1);
+        oled_drawpoint(x - yend,y - xend,1);
+    }
 }
 
 void oled_sectorial_circle(uint8_t x,uint8_t y,double angle_start,double angle_end,uint8_t r,uint8_t t)
